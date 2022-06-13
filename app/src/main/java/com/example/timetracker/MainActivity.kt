@@ -8,6 +8,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -39,6 +40,8 @@ class MainActivity : ComponentActivity() {
                 Column {
                     Text(text = "Time Tracker")
                     Watch()
+                    //SwipeToDismissListItems()
+
                 }
             }
         }
@@ -79,39 +82,47 @@ fun Watch() {
         targetValue = if(isCounting) MaterialTheme.colors.primary else MaterialTheme.colors.secondary
     )
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.clickable {
-            isCounting = !isCounting
-            if (isCounting) {
-                tickerTask = tickerTimer.scheduleAtFixedRate(
-                    delay = 0,
-                    period = secToMSec,
-                ) {
-                    tickTock1Sec()
-                    Log.v("Rah", time.toString())
+    Column {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.clickable {
+                isCounting = !isCounting
+                if (isCounting) {
+                    tickerTask = tickerTimer.scheduleAtFixedRate(
+                        delay = 0,
+                        period = secToMSec,
+                    ) {
+                        tickTock1Sec()
+                        Log.v("Rah", time.toString())
+                    }
+                } else {
+                    Log.v("Rah", "pls close")
+                    tickerTask.cancel()
                 }
             }
-            else {
-                Log.v("Rah", "pls close")
-                tickerTask.cancel()
-            }
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = circleColor,
+                modifier = Modifier.size(200.dp)
+            ) {}
+            Text(text = time.toString())
         }
-    ) {
-        Surface(
-            shape = CircleShape,
-            color = circleColor,
-            modifier = Modifier.size(200.dp)) {}
-        Text(text = time.toString() )
+        var reset by remember {
+            mutableStateOf(false)
+        }
+        if (!isCounting && time != Triple(0, 0, 0)) {
+            /*SlidingSwitch(checked = reset, onCheckedChange = {
+                time = Triple(0, 0, 0)
+            })*/
+            SlidingSwitch2(
+                modifier = Modifier.padding(horizontal = 30.dp),
+                onSwitched = {time = Triple(0, 0, 0)}
+            )
+        }
     }
-    var reset by remember {
-        mutableStateOf(false)
-    }
-    if (!isCounting && time != Triple(0,0,0)) {
-        SlidingSwitch(checked = reset, onCheckedChange = {
-            time = Triple(0,0,0)
-        })
-    }
+
+
 }
 
 
